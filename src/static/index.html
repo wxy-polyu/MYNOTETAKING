@@ -47,26 +47,28 @@
 
         .main-content {
             display: grid;
-            grid-template-columns: 1fr 2fr;
-            gap: 30px;
+            grid-template-columns: minmax(300px, 380px) minmax(0, 1fr);
+            gap: 24px;
             flex: 1;
+            align-items: stretch;
         }
 
-        .sidebar {
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            backdrop-filter: blur(10px);
-            height: fit-content;
-        }
-
+        .sidebar,
         .note-editor {
             background: rgba(255, 255, 255, 0.95);
             border-radius: 15px;
-            padding: 25px;
+            padding: 22px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.1);
             backdrop-filter: blur(10px);
+            min-height: 520px;
+        }
+
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .note-editor {
             display: flex;
             flex-direction: column;
         }
@@ -106,8 +108,10 @@
         }
 
         .notes-list {
-            max-height: 500px;
+            flex: 1;
+            min-height: 0;
             overflow-y: auto;
+            padding-right: 4px;
         }
 
         .note-item {
@@ -160,12 +164,17 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 20px;
+            gap: 12px;
+            margin-bottom: 16px;
         }
 
         .editor-title {
-            font-size: 1.5rem;
+            font-size: 1.35rem;
             color: #333;
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         .editor-actions {
@@ -272,8 +281,19 @@
         }
 
         .form-textarea.translation-output {
-            min-height: 150px;
+            min-height: 96px;
+            height: 96px;
+            flex: none;
             background: #fafbfc;
+        }
+
+        #editorForm {
+            display: none;
+            flex-direction: column;
+        }
+
+        .content-group {
+            margin-bottom: 14px;
         }
 
         .form-group {
@@ -303,15 +323,16 @@
 
         .form-textarea {
             width: 100%;
-            min-height: 300px;
-            padding: 15px;
+            min-height: 140px;
+            height: 168px;
+            padding: 14px 15px;
             border: 2px solid #e1e5e9;
             border-radius: 10px;
-            font-size: 16px;
+            font-size: 15px;
             font-family: inherit;
             resize: vertical;
             transition: border-color 0.3s ease;
-            line-height: 1.6;
+            line-height: 1.55;
         }
 
         .form-textarea:focus {
@@ -321,8 +342,12 @@
 
         .empty-state {
             text-align: center;
-            padding: 60px 20px;
+            padding: 48px 16px;
             color: #666;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .empty-state h3 {
@@ -376,6 +401,7 @@
             
             .sidebar, .note-editor {
                 padding: 20px;
+                min-height: 0;
             }
         }
 
@@ -433,7 +459,7 @@
                         <input type="text" class="form-input" id="noteTitle" placeholder="Enter note title...">
                     </div>
 
-                    <div class="form-group">
+                    <div class="form-group content-group">
                         <label class="form-label" for="noteContent">Content</label>
                         <textarea class="form-textarea" id="noteContent" placeholder="Start writing your note..."></textarea>
                     </div>
@@ -585,7 +611,7 @@
 
             showEditor() {
                 document.getElementById('emptyState').style.display = 'none';
-                document.getElementById('editorForm').style.display = 'block';
+                document.getElementById('editorForm').style.display = 'flex';
                 document.getElementById('editorActions').style.display = 'flex';
             }
 
