@@ -8,6 +8,7 @@ A modern, responsive web application for managing personal notes with a beautifu
 - **Edit Notes**: Update existing notes with real-time editing
 - **Delete Notes**: Remove notes you no longer need
 - **Search Notes**: Find notes quickly by searching titles and content
+- **Translate Notes**: Translate note title and content with DeepSeek LLM
 - **Auto-save**: Notes are automatically saved as you type
 - **Responsive Design**: Works perfectly on desktop and mobile devices
 - **Modern UI**: Beautiful gradient design with smooth animations
@@ -15,7 +16,7 @@ A modern, responsive web application for managing personal notes with a beautifu
 
 ## 🚀 Live Demo
 
-The application is deployed and accessible at: **https://3dhkilc88dkk.manus.space**
+Deploy to Vercel and set your production URL here after deployment.
 
 ## 🛠 Technology Stack
 
@@ -30,7 +31,11 @@ The application is deployed and accessible at: **https://3dhkilc88dkk.manus.spac
 - **Flask-CORS**: Cross-origin resource sharing support
 
 ### Database
-- **SQLite**: Lightweight, file-based database for data persistence
+- **SQLite**: Local development (default)
+- **Neon PostgreSQL**: Recommended for Vercel production (`DATABASE_URL`)
+
+### AI
+- **DeepSeek API**: Note translation via server-side `/api/translate`
 
 ## 📁 Project Structure
 
@@ -63,28 +68,38 @@ notetaking-app/
 ### Installation Steps
 
 1. **Clone or download the project**
+
+2. **Configure environment**
+
+   Copy `.env.example` to `.env` and set `DEEPSEEK_API_KEY`. Optionally set `DATABASE_URL` for Neon.
+
+3. **Run (recommended on macOS)**
+
+   If `pip` fails with `pyexpat` / `_XML_SetAllocTrackerActivationThreshold`, your Homebrew Python 3.12 is broken — use system Python for the venv:
+
    ```bash
-   python -m venv venv
+   chmod +x scripts/run_local.sh
+   ./scripts/run_local.sh
    ```
 
-2. **Activate the virtual environment**
+   Or manually:
+
    ```bash
+   rm -rf venv
+   /usr/bin/python3 -m venv venv
    source venv/bin/activate
-   ```
-
-   Remark: On Windows, use `venv\Scripts\activate`
-
-3. **Install dependencies**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. **Run the application**
-   ```bash
+   pip install --upgrade pip -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn
+   pip install -r requirements.txt -i https://pypi.tuna.tsinghua.edu.cn/simple --trusted-host pypi.tuna.tsinghua.edu.cn
    python src/main.py
    ```
 
-5. **Access the application**
+   If `pip` fails with SSL to `files.pythonhosted.org`, use the mirror commands above (or run `./scripts/run_local.sh`).
+
+   Local dev uses SQLite and does **not** need `psycopg2`. For Vercel/Neon use `requirements-prod.txt` (Vercel: set **Install Command** to `pip install -r requirements-prod.txt`).
+
+   To fix Homebrew Python long-term: `brew reinstall python@3.12 expat`
+
+6. **Access the application**
    - Open your browser and go to `http://localhost:5001`
 
 ## 📡 API Endpoints
@@ -96,6 +111,7 @@ notetaking-app/
 - `PUT /api/notes/<id>` - Update a note
 - `DELETE /api/notes/<id>` - Delete a note
 - `GET /api/notes/search?q=<query>` - Search notes
+- `POST /api/translate` - Translate text (`text`, `target_language`)
 
 ### Request/Response Format
 ```json
@@ -143,24 +159,28 @@ CREATE TABLE note (
 );
 ```
 
-## 🚀 Deployment
+## 🚀 Deployment (Vercel + Neon)
 
-The application is configured for easy deployment with:
-- CORS enabled for cross-origin requests
-- Host binding to `0.0.0.0` for external access
-- Production-ready Flask configuration
-- Persistent SQLite database
+1. Create a [Neon](https://neon.tech) database and copy the PostgreSQL connection string.
+2. Import this repo in [Vercel](https://vercel.com) and deploy.
+3. Set **Environment Variables** in Vercel:
+   - `DEEPSEEK_API_KEY` — your DeepSeek API key
+   - `DATABASE_URL` — Neon connection string
+   - `SECRET_KEY` — random string for Flask
+4. Redeploy after adding variables.
+5. **Deployment Protection** → turn off **Require log in** so the app is public.
+6. Test notes CRUD and the **Translate** button on the live site.
+
+Local production-like testing: set `DATABASE_URL` in `.env` and run `python src/main.py`.
 
 ## 🔧 Configuration
 
 ### Environment Variables
-- `FLASK_ENV`: Set to `development` for debug mode
+- `DEEPSEEK_API_KEY`: DeepSeek API key (required for translation)
+- `DEEPSEEK_API_BASE`: Optional, default `https://api.deepseek.com`
+- `DEEPSEEK_MODEL`: Optional, default `deepseek-chat`
+- `DATABASE_URL`: Neon PostgreSQL URL (production); omit for local SQLite
 - `SECRET_KEY`: Flask secret key for sessions
-
-### Database Configuration
-- Database file: `src/database/app.db`
-- Automatic table creation on first run
-- SQLAlchemy ORM for database operations
 
 ## 📱 Browser Compatibility
 
