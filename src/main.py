@@ -32,6 +32,8 @@ def _database_uri():
     if url:
         if url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql://", 1)
+        if url.startswith("postgresql://"):
+            url = url.replace("postgresql://", "postgresql+psycopg://", 1)
         return url
     DB_PATH = os.path.join(ROOT_DIR, 'database', 'app.db')
     os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
